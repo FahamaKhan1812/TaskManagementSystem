@@ -1,4 +1,12 @@
-﻿namespace TaskManagementSystem.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TaskManagementSystem.Domain.Entities;
 public class Category
 {
+    [Key]
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+
+    // Navigation property for the Task relationship
+    public ICollection<Task> Tasks { get; set; }
 }
