@@ -77,4 +77,17 @@ public class CategoryController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCategory(Guid id)
+    {
+        var command = new DeleteCategoryCommand() { CategoryId = id };
+
+        var resposne = await _mediator.Send(command);
+        if(resposne.IsError)
+        {
+            return BadRequest();
+        }
+        return NoContent();
+
+    }
 }
