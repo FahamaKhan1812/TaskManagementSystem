@@ -2,6 +2,7 @@
 using MediatR;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Contracts.Category.Request;
+using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
 using TaskManagementSystem.Domain.Entities;
@@ -40,6 +41,7 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
             result.IsError = true;
             Error erros = new()
             {
+                Code = ErrorCode.UnknownError,
                 Message = ex.Message
             };
 

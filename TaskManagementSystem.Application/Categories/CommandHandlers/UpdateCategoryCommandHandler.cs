@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Contracts.Category.Request;
+using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
 
@@ -31,6 +32,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
                 result.IsError = true;
                 Error error = new()
                 {
+                    Code = ErrorCode.NotFound,
                     Message = "No Category is found."
                 };
                 result.Errors.Add(error);
@@ -50,6 +52,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
             result.IsError = true;
             Error erros = new()
             {
+                Code = ErrorCode.UnknownError,
                 Message = ex.Message
             };
 

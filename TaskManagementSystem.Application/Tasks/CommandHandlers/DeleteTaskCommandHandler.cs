@@ -1,41 +1,39 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
+using TaskManagementSystem.Application.Tasks.Commands;
 using TaskManagementSystem.DAL.Data;
 
-namespace TaskManagementSystem.Application.Categories.CommandHandlers;
-public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, OperationResult<string>>
+namespace TaskManagementSystem.Application.Tasks.CommandHandlers;
+internal class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand, OperationResult<string>>
 {
     private readonly DataContext _dataContext;
 
-    public DeleteCategoryCommandHandler(DataContext dataContext)
+    public DeleteTaskCommandHandler(DataContext dataContext)
     {
         _dataContext = dataContext;
     }
 
-    public async Task<OperationResult<string>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<OperationResult<string>> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
     {
         var result = new OperationResult<string>();
         try
         {
-            var category = await _dataContext.Categories
-               .FirstOrDefaultAsync(c => c.Id == request.CategoryId, cancellationToken);
-
-            if (category == null)
+            var task = await _dataContext.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
+            if (task is null)
             {
+
                 result.IsError = true;
                 Error error = new()
                 {
                     Code = ErrorCode.NotFound,
-                    Message = "No Category is found."
+                    Message = "No task is found."
                 };
                 result.Errors.Add(error);
                 return result;
             }
-
-            _dataContext.Categories.Remove(category);
+            _dataContext.Remove(task);
             await _dataContext.SaveChangesAsync(cancellationToken);
             result.Payload = "Deleted successfully";
         }
