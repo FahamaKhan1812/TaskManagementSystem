@@ -17,11 +17,4 @@
     <ProjectReference Include="..\TaskManagementSystem.DAL\TaskManagementSystem.DAL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Tasks\Commands\" />
-    <Folder Include="Tasks\CommandHandlers\" />
-    <Folder Include="Tasks\QueryHandlers\" />
-    <Folder Include="Tasks\Queries\" />
-  </ItemGroup>
-
 </Project>

@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Categories.Queries;
 using TaskManagementSystem.Application.Contracts.Category.Response;
+using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
 using TaskManagementSystem.Domain.Entities;
@@ -34,6 +35,7 @@ public class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, Operati
             result.IsError = true;
             Error erros = new()
             {
+                Code = ErrorCode.UnknownError,
                 Message = ex.Message
             };
 
