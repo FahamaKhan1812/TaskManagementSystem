@@ -14,4 +14,8 @@ public class Task
     // Navigation property for the Category relationship
     public Guid CategoryId { get; set; }
     public Category Category { get; set; }
+
+    // Navigation property for the User relationship
+    public Guid UserProfileId { get; set; }
+    public User User { get; set; }
 }
