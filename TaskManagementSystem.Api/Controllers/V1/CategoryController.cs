@@ -5,7 +5,7 @@ using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Categories.Queries;
 using TaskManagementSystem.Application.Contracts.Category.Request;
 
-namespace TaskManagementSystem.Api.Controllers;
+namespace TaskManagementSystem.Api.Controllers.V1;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -23,7 +23,7 @@ public class CategoryController : ControllerBase
     {
         var query = new GetAllCategories();
         var response = await _mediator.Send(query);
-        if(response.IsError)
+        if (response.IsError)
         {
             return BadRequest(response);
         }
@@ -41,9 +41,9 @@ public class CategoryController : ControllerBase
         }
         return Ok(resposne);
     }
-   
+
     [HttpPost]
-    public async Task<IActionResult> CreateCategory([FromBody] CreateCategory request) 
+    public async Task<IActionResult> CreateCategory([FromBody] CreateCategory request)
     {
         var command = new CreateCategoryCommand()
         {
@@ -51,12 +51,12 @@ public class CategoryController : ControllerBase
         };
 
         var result = await _mediator.Send(command);
-        if(result.IsError)
+        if (result.IsError)
         {
             return BadRequest();
         }
 
-        return CreatedAtAction(nameof(GetCategory), new {id = result.Payload.Id}, result);
+        return CreatedAtAction(nameof(GetCategory), new { id = result.Payload.Id }, result);
     }
 
 
@@ -69,7 +69,7 @@ public class CategoryController : ControllerBase
             Name = updateRequest.Name,
         };
         var result = await _mediator.Send(command);
-        if(result.IsError)
+        if (result.IsError)
         {
             return BadRequest();
         }
@@ -83,7 +83,7 @@ public class CategoryController : ControllerBase
         var command = new DeleteCategoryCommand() { CategoryId = id };
 
         var resposne = await _mediator.Send(command);
-        if(resposne.IsError)
+        if (resposne.IsError)
         {
             return BadRequest();
         }

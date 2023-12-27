@@ -5,7 +5,7 @@ using TaskManagementSystem.Application.Contracts.Identity.Request;
 using TaskManagementSystem.Application.Contracts.Identity.Response;
 using TaskManagementSystem.Application.Identity.Commands;
 
-namespace TaskManagementSystem.Api.Controllers;
+namespace TaskManagementSystem.Api.Controllers.V1;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -52,5 +52,5 @@ public class IdentityController : BaseController
 
 
         return result.IsError ? HandleErrorResponse(result.Errors) : Ok(authResult);
-    } 
+    }
 }
