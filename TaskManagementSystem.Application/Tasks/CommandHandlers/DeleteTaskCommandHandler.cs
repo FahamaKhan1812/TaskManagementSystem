@@ -33,6 +33,17 @@ internal class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand, Ope
                 result.Errors.Add(error);
                 return result;
             }
+            if (task.UserProfileId != request.UserId)
+            {
+                result.IsError = true;
+                Error error = new()
+                {
+                    Code = ErrorCode.UserNotAllowed,
+                    Message = "User is not allowed to do specific operation"
+                };
+                result.Errors.Add(error);
+                return result;
+            }
             _dataContext.Remove(task);
             await _dataContext.SaveChangesAsync(cancellationToken);
             result.Payload = "Deleted successfully";

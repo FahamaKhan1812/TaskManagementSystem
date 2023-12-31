@@ -5,15 +5,16 @@ using TaskManagementSystem.Application.Contracts.Task.Request;
 using TaskManagementSystem.Application.Tasks.Commands;
 using TaskManagementSystem.Application.Tasks.Queries;
 
-namespace TaskManagementSystem.Api.Controllers;
+namespace TaskManagementSystem.Api.Controllers.V1;
 
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route(ApiRoutes.BaseRoute)]
 [ApiController]
-public class TaskController : BaseController
+public class TasksController : BaseController
 {
     private readonly IMediator _mediator;
 
-    public TaskController(IMediator mediator)
+    public TasksController(IMediator mediator)
     {
         _mediator = mediator;
     }
@@ -25,7 +26,7 @@ public class TaskController : BaseController
         var response = await _mediator.Send(query);
         return response.IsError ? HandleErrorResponse(response.Errors) : Ok(response.Payload);
     }
-  
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetTaskById(Guid id)
     {
@@ -45,10 +46,11 @@ public class TaskController : BaseController
             Priority = request.Priority,
             IsCompleted = request.IsCompleted,
             CategoryId = request.CategoryId,
+            UserId = request.UserId
         };
 
         var result = await _mediator.Send(command);
-        return result.IsError ? HandleErrorResponse(result.Errors) 
+        return result.IsError ? HandleErrorResponse(result.Errors)
             : CreatedAtAction(nameof(GetTaskById), new { id = result.Payload.Id }, result.Payload);
     }
 
@@ -62,16 +64,21 @@ public class TaskController : BaseController
             TaskId = id,
             Title = request.Title,
             Priority = request.Priority,
-            CategoryId= request.CategoryId,
+            CategoryId = request.CategoryId,
+            UserId = request.UserId
         };
 
         var result = await _mediator.Send(command);
         return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTask(Guid id)
+    public async Task<IActionResult> DeleteTask(Guid id, [FromBody] DeleteTask request)
     {
-        var command = new DeleteTaskCommand() { TaskId = id };
+        var command = new DeleteTaskCommand() 
+        { 
+            TaskId = id,
+            UserId = request.UserId
+        };
         var resposne = await _mediator.Send(command);
         return resposne.IsError ? HandleErrorResponse(resposne.Errors) : NoContent();
     }
