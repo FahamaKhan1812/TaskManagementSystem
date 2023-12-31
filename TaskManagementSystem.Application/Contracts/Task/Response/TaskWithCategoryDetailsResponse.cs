@@ -12,5 +12,11 @@ public class TaskWithCategoryDetailsResponse
 
     // Details of the associated category
     public Domain.Entities.Category Category { get; set; }
+    public UserObj User { get; set; }
 }
 
+public class UserObj
+{
+    public string UserName { get; set; }
+    public string FullName { get; set; }
+}
