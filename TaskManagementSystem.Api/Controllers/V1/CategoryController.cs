@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementSystem.Application.Categories.Commads;
@@ -41,7 +42,7 @@ public class CategoryController : ControllerBase
         }
         return Ok(resposne);
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> CreateCategory([FromBody] CreateCategory request)
     {
@@ -59,7 +60,7 @@ public class CategoryController : ControllerBase
         return CreatedAtAction(nameof(GetCategory), new { id = result.Payload.Id }, result);
     }
 
-
+    [Authorize(Roles = "Admin")]
     [HttpPatch("{id}")]
     public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategory updateRequest)
     {
@@ -76,7 +77,7 @@ public class CategoryController : ControllerBase
 
         return NoContent();
     }
-
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(Guid id)
     {

@@ -7,6 +7,7 @@ namespace TaskManagementSystem.Application.Tasks.Commands;
 public class CreateTaskCommand : IRequest<OperationResult<CreateTask>>
 {
     public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid UserId { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
     public DateTime CreatedDate { get; private set; } = DateTime.Now;

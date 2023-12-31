@@ -7,6 +7,7 @@ namespace TaskManagementSystem.Application.Tasks.Commands;
 public class UpdateTaskCommand : IRequest<OperationResult<UpdateTask>>
 {
     public Guid TaskId { get; set; }
+    public Guid UserId { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
     public bool IsCompleted { get; set; }

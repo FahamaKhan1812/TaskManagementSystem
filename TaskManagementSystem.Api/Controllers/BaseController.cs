@@ -58,6 +58,18 @@ public class BaseController : ControllerBase
             return NotFound(apiError);
         }
 
+        if (errors.Any(e => e.Code == ErrorCode.UserNotAllowed))
+        {
+            var error = errors.FirstOrDefault(e => e.Code == ErrorCode.UserNotAllowed);
+
+            apiError.StatusCode = 403;
+            apiError.StatusPhrase = "Forbidden Request";
+            apiError.Timestamp = DateTime.Now;
+            apiError.Errors.Add(error.Message);
+
+            return BadRequest(apiError);
+        }
+
         apiError.StatusCode = 500;
         apiError.StatusPhrase = "Server Error";
         apiError.Timestamp = DateTime.Now;
