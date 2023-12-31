@@ -37,6 +37,17 @@ public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, Opera
                 result.Errors.Add(error);
                 return result;
             }
+            if(task.UserProfileId != request.UserId)
+            {
+                result.IsError = true;
+                Error error = new()
+                {
+                    Code = ErrorCode.UserNotAllowed,
+                    Message = "User is not allowed to do specific operation"
+                };
+                result.Errors.Add(error);
+                return result;
+            }
             task.Title = request.Title;
             task.Description = request.Description;
             task.IsCompleted = request.IsCompleted;

@@ -11,11 +11,12 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Operation
 {
     private readonly DataContext _dataContext;
     private readonly UserManager<IdentityUser> _userManager;
-
-    public RegisterCommandHandler(DataContext dataContext, UserManager<IdentityUser> userManager)
+    private readonly RoleManager<IdentityRole> _roleManager;
+    public RegisterCommandHandler(DataContext dataContext, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         _dataContext = dataContext;
         _userManager = userManager;
+        _roleManager = roleManager;
     }
 
     public async Task<OperationResult<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -71,13 +72,21 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Operation
                 Email = request.Username,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Role = "Kebab Role",
+                Role = "User",
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow
             };
 
             try
             {
+                // For assinging user Admin Role.
+                //if (!await _roleManager.RoleExistsAsync(UserRole.Admin))
+                //    await _roleManager.CreateAsync(new IdentityRole(UserRole.Admin));
+
+                //if (await _roleManager.RoleExistsAsync(UserRole.Admin))
+                //{
+                //    await _userManager.AddToRoleAsync(identity, UserRole.Admin);
+                //}
                 _dataContext.Add(userInfo);
                 await _dataContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);

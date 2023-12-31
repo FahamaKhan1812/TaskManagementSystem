@@ -12,6 +12,7 @@ public enum ErrorCode
     IncorrectPassword = 204,
 
     //Application Error should be in the range of 300 - 399
-    
+    UserNotAllowed = 300,
+
     UnknownError = 999
 }

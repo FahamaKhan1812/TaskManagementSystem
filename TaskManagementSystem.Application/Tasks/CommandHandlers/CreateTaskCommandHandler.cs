@@ -32,7 +32,8 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Opera
                 IsCompleted = request.IsCompleted,
                 Title = request.Title,
                 CategoryId = request.CategoryId,
-                UpdatedDate = request.UpdatedDate                
+                UpdatedDate = request.UpdatedDate,
+                UserProfileId = request.UserId
             };
             await _dataContext.Tasks.AddAsync(task, cancellationToken);
             await _dataContext.SaveChangesAsync(cancellationToken);

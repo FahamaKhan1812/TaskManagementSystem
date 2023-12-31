@@ -46,6 +46,7 @@ public class TasksController : BaseController
             Priority = request.Priority,
             IsCompleted = request.IsCompleted,
             CategoryId = request.CategoryId,
+            UserId = request.UserId
         };
 
         var result = await _mediator.Send(command);
@@ -64,6 +65,7 @@ public class TasksController : BaseController
             Title = request.Title,
             Priority = request.Priority,
             CategoryId = request.CategoryId,
+            UserId = request.UserId
         };
 
         var result = await _mediator.Send(command);
