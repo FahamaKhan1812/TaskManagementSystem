@@ -72,9 +72,13 @@ public class TasksController : BaseController
         return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTask(Guid id)
+    public async Task<IActionResult> DeleteTask(Guid id, [FromBody] DeleteTask request)
     {
-        var command = new DeleteTaskCommand() { TaskId = id };
+        var command = new DeleteTaskCommand() 
+        { 
+            TaskId = id,
+            UserId = request.UserId
+        };
         var resposne = await _mediator.Send(command);
         return resposne.IsError ? HandleErrorResponse(resposne.Errors) : NoContent();
     }
