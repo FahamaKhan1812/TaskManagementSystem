@@ -25,6 +25,8 @@ internal class GetTaskByIdHandler : IRequestHandler<GetTaskById, OperationResult
         {
             var task = await _dataContext.Tasks
                 .Include(t => t.Category)
+                .Include(u => u.User)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
             if(task is null)
             {

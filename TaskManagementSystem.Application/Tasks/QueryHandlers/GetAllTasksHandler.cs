@@ -27,6 +27,8 @@ public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<L
         {
             var tasksWithCategoryName = await _dataContext.Tasks
                     .Include(t => t.Category) // Include the Category navigation property
+                    .Include(u => u.User)
+                    .AsNoTracking()
                     .ToListAsync(cancellationToken);
 
             result.Payload = _mapper.Map<List<TaskWithCategoryDetailsResponse>>(tasksWithCategoryName);
