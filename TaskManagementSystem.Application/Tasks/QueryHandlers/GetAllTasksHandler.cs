@@ -8,7 +8,7 @@ using TaskManagementSystem.Application.Tasks.Queries;
 using TaskManagementSystem.DAL.Data;
 
 namespace TaskManagementSystem.Application.Tasks.QueryHandlers;
-public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<List<TaskWithCategoryDetailsResponse>>>
+public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<TaskResponse>>
 {
     private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
@@ -19,19 +19,30 @@ public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<L
         _mapper = mapper;
     }
 
-    public async Task<OperationResult<List<TaskWithCategoryDetailsResponse>>> Handle(GetAllTasks request, CancellationToken cancellationToken)
+    public async Task<OperationResult<TaskResponse>> Handle(GetAllTasks request, CancellationToken cancellationToken)
     {
-        var result = new OperationResult<List<TaskWithCategoryDetailsResponse>>();
+        var result = new OperationResult<TaskResponse>();
 
         try
         {
+            var pageCount = Math.Ceiling(_dataContext.Tasks.Count() / (float)request.PageSize);
             var tasksWithCategoryName = await _dataContext.Tasks
+                    .Skip((request.Page - 1) * request.PageSize)
+                    .Take(request.PageSize)
                     .Include(t => t.Category) // Include the Category navigation property
                     .Include(u => u.User)
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
-
-            result.Payload = _mapper.Map<List<TaskWithCategoryDetailsResponse>>(tasksWithCategoryName);
+                
+            var mappedData = _mapper.Map<List<TaskWithCategoryDetailsResponse>>(tasksWithCategoryName);
+            
+            TaskResponse obj = new()
+            {
+                Pages = (int)pageCount,
+                CurrentPage = request.Page,
+                Tasks = mappedData
+            };
+            result.Payload = obj;
         }
         catch (Exception ex)
         {

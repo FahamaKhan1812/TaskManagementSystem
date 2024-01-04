@@ -20,14 +20,14 @@ public class TasksController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllTasks()
+    public async Task<IActionResult> GetAllTasks([FromQuery] int page, int pageSize)
     {
-        var query = new GetAllTasks();
+        var query = new GetAllTasks(page, pageSize);
         var response = await _mediator.Send(query);
         return response.IsError ? HandleErrorResponse(response.Errors) : Ok(response.Payload);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("task{id}")]
     public async Task<IActionResult> GetTaskById(Guid id)
     {
         var query = new GetTaskById() { TaskId = id };
