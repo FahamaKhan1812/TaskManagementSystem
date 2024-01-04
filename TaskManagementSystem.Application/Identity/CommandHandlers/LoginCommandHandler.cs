@@ -64,7 +64,10 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
             {
                 result.Payload = GenerateJwt(identityUser, userRoles[0]);
             }
-            result.Payload = GenerateJwt(identityUser);
+            else 
+            { 
+                result.Payload = GenerateJwt(identityUser);
+            }
         }
         catch (Exception ex)
         {
