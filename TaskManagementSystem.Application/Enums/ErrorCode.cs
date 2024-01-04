@@ -3,9 +3,9 @@ public enum ErrorCode
 {
     NotFound = 404,
     ServerError = 500,
-    
+
     ValidationError = 101,
-    
+
     IdentityUserAlreadyExists = 201,
     IdentityCreationFailed = 202,
     IdentityUserNotFound = 203,
@@ -13,6 +13,7 @@ public enum ErrorCode
 
     //Application Error should be in the range of 300 - 399
     UserNotAllowed = 300,
+    UnAuthorizedAccountRemoval = 306,
 
     UnknownError = 999
 }
