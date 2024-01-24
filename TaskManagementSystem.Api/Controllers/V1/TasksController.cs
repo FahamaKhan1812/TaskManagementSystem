@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementSystem.Application.Contracts.Task.Request;
@@ -10,6 +12,7 @@ namespace TaskManagementSystem.Api.Controllers.V1;
 [ApiVersion("1.0")]
 [Route(ApiRoutes.BaseRoute)]
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class TasksController : BaseController
 {
     private readonly IMediator _mediator;
@@ -27,7 +30,7 @@ public class TasksController : BaseController
         return response.IsError ? HandleErrorResponse(response.Errors) : Ok(response.Payload);
     }
 
-    [HttpGet("task{id}")]
+    [HttpGet(ApiRoutes.Tasks.IdRoute)]
     public async Task<IActionResult> GetTaskById(Guid id)
     {
         var query = new GetTaskById() { TaskId = id };
@@ -35,7 +38,7 @@ public class TasksController : BaseController
         return response.IsError ? HandleErrorResponse(response.Errors) : Ok(response.Payload);
     }
 
-    [HttpPost("")]
+    [HttpPost]
     public async Task<IActionResult> CreateTask([FromBody] CreateTask request)
     {
         var command = new CreateTaskCommand()
@@ -54,7 +57,7 @@ public class TasksController : BaseController
             : CreatedAtAction(nameof(GetTaskById), new { id = result.Payload.Id }, result.Payload);
     }
 
-    [HttpPatch("{id}")]
+    [HttpPatch(ApiRoutes.Tasks.IdRoute)]
     public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTask request)
     {
         var command = new UpdateTaskCommand()
@@ -71,7 +74,7 @@ public class TasksController : BaseController
         var result = await _mediator.Send(command);
         return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
-    [HttpDelete("{id}")]
+    [HttpDelete(ApiRoutes.Tasks.IdRoute)]
     public async Task<IActionResult> DeleteTask(Guid id)
     {
         var command = new DeleteTaskCommand() { TaskId = id };
