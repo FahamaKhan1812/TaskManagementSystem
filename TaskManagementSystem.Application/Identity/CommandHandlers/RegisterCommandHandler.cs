@@ -72,7 +72,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Operation
                 Email = request.Username,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                Role = "User",
+                Role = UserRole.User,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow
             };
