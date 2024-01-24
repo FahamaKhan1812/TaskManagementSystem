@@ -94,7 +94,10 @@ public class BaseController : ControllerBase
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
 
-            return BadRequest(apiError);
+            return new ObjectResult(apiError)
+            {
+                StatusCode = 403
+            };
         }
 
         apiError.StatusCode = 500;

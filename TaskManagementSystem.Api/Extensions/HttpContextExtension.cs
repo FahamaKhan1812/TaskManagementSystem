@@ -14,7 +14,11 @@ public static class HttpContextExtensions
 
         return null;
     }
-
+    public static Guid GetUserProfileIdClaimValue(this HttpContext context)
+    {
+        var userProfileId = GetClaimValue(context, "UserId");
+        return userProfileId;
+    }
     private static Guid GetClaimValue(this HttpContext context, string key)
     {
         var identity = context.User.Identity as ClaimsIdentity;

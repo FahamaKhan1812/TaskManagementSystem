@@ -5,8 +5,6 @@ namespace TaskManagementSystem.Application.Contracts.Task.Request;
 public class CreateTask
 {
     public Guid Id { get; private set; }
-    [Required]
-    public Guid UserId { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
     public Priority Priority { get; set; }

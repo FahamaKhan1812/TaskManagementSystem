@@ -10,6 +10,4 @@ public class UpdateTask
     public Priority Priority { get; set; }
     [Required]
     public Guid CategoryId { get; set; }
-    [Required]
-    public Guid UserId { get; set; }
 }

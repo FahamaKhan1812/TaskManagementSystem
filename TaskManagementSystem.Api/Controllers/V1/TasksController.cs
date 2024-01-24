@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TaskManagementSystem.Api.Extensions;
 using TaskManagementSystem.Application.Contracts.Task.Request;
 using TaskManagementSystem.Application.Tasks.Commands;
 using TaskManagementSystem.Application.Tasks.Queries;
@@ -41,6 +42,7 @@ public class TasksController : BaseController
     [HttpPost]
     public async Task<IActionResult> CreateTask([FromBody] CreateTask request)
     {
+        var userClaim = HttpContext.GetUserProfileIdClaimValue();
         var command = new CreateTaskCommand()
         {
             Id = request.Id,
@@ -49,7 +51,7 @@ public class TasksController : BaseController
             Priority = request.Priority,
             IsCompleted = request.IsCompleted,
             CategoryId = request.CategoryId,
-            UserId = request.UserId
+            UserId = userClaim
         };
 
         var result = await _mediator.Send(command);
@@ -60,6 +62,7 @@ public class TasksController : BaseController
     [HttpPatch(ApiRoutes.Tasks.IdRoute)]
     public async Task<IActionResult> UpdateTask(Guid id, [FromBody] UpdateTask request)
     {
+        var userClaim = HttpContext.GetUserProfileIdClaimValue();
         var command = new UpdateTaskCommand()
         {
             Description = request.Description,
@@ -68,19 +71,21 @@ public class TasksController : BaseController
             Title = request.Title,
             Priority = request.Priority,
             CategoryId = request.CategoryId,
-            UserId = request.UserId
+            UserId = userClaim
         };
 
         var result = await _mediator.Send(command);
         return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
+    
     [HttpDelete(ApiRoutes.Tasks.IdRoute)]
     public async Task<IActionResult> DeleteTask(Guid id)
     {
+        var userClaim = HttpContext.GetUserProfileIdClaimValue();
         var command = new DeleteTaskCommand() 
         { 
             TaskId = id,
-            UserId = request.UserId
+            UserId = userClaim
         };
         var resposne = await _mediator.Send(command);
         return resposne.IsError ? HandleErrorResponse(resposne.Errors) : NoContent();

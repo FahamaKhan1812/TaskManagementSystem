@@ -91,7 +91,7 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()),
-                new Claim("User Id", user.Id),
+                new Claim("UserId", user.Id),
                 new Claim(ClaimTypes.Role, userRolesList)
          });
         var token = _identityServices.CreateSecurityToken(claimsIdentity);
