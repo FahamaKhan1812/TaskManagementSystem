@@ -7,4 +7,5 @@ public class UpdateCategoryCommand : IRequest<OperationResult<UpdateCategory>>
 {
     public Guid Id { get;  set; }
     public string Name { get; set; }
+    public string UserRole { get; set; }
 }

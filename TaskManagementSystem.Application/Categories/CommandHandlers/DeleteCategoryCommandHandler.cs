@@ -4,6 +4,7 @@ using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Entities;
 
 namespace TaskManagementSystem.Application.Categories.CommandHandlers;
 public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, OperationResult<string>>
@@ -30,6 +31,17 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
                 {
                     Code = ErrorCode.NotFound,
                     Message = "No Category is found."
+                };
+                result.Errors.Add(error);
+                return result;
+            }
+            if (request.UserRole == UserRole.User)
+            {
+                result.IsError = true;
+                Error error = new()
+                {
+                    Code = ErrorCode.UserNotAllowed,
+                    Message = "User is not allowed to perform this action"
                 };
                 result.Errors.Add(error);
                 return result;

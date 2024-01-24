@@ -29,7 +29,17 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
                 Id = request.Id,
                 Name = request.Name,
             };
-
+            if (request.UserRole == UserRole.User)
+            {
+                result.IsError = true;
+                Error error = new()
+                {
+                    Code = ErrorCode.UserNotAllowed,
+                    Message = "User is not allowed to perform this action"
+                };
+                result.Errors.Add(error);
+                return result;
+            }
             await _dataContext.Categories.AddAsync(category, cancellationToken);
             await _dataContext.SaveChangesAsync(cancellationToken);
             var mappedCategory = _mapper.Map<CreateCategory>(category);

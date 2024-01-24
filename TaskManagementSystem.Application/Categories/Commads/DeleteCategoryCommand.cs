@@ -5,4 +5,5 @@ namespace TaskManagementSystem.Application.Categories.Commads;
 public class DeleteCategoryCommand : IRequest<OperationResult<string>>
 {
     public Guid CategoryId { get; set; }
+    public string UserRole { get; set; }
 }
