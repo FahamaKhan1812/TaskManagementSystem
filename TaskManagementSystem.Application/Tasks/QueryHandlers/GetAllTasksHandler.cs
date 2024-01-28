@@ -27,6 +27,7 @@ public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<T
         {
             var pageCount = Math.Ceiling(_dataContext.Tasks.Count() / (float)request.PageSize);
             var tasksWithCategoryName = await _dataContext.Tasks
+                    .OrderBy(t => t.Id)
                     .Skip((request.Page - 1) * request.PageSize)
                     .Take(request.PageSize)
                     .Include(t => t.Category) // Include the Category navigation property
