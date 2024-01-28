@@ -20,7 +20,7 @@ public class CategoryController : BaseController
 {
     private readonly IMediator _mediator;
 
-    public CategoryController(IMediator mediator)
+    public CategoryController(IMediator mediator, ILogger<BaseController> logger) : base(logger)
     {
         _mediator = mediator;
     }
