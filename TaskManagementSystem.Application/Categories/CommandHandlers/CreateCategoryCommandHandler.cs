@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Contracts.Category.Request;
 using TaskManagementSystem.Application.Enums;
@@ -12,11 +13,15 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
 {
     private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
+    private readonly ILogger<CreateCategoryCommandHandler> _logger;
 
-    public CreateCategoryCommandHandler(DataContext dataContext, IMapper mapper)
+    public CreateCategoryCommandHandler(DataContext dataContext,
+                                        IMapper mapper,
+                                        ILogger<CreateCategoryCommandHandler> logger)
     {
         _dataContext = dataContext;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<OperationResult<CreateCategory>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
@@ -56,6 +61,8 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
             };
 
             result.Errors.Add(erros);
+            // Log the exception details
+            _logger.LogError(ex, $"An error occurred while creating category: {erros}");
         }
 
         return result;
