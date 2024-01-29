@@ -10,6 +10,8 @@ public class Task
     public DateTime UpdatedDate { get; set;}
     public Priority Priority { get; set; }
     public bool IsCompleted { get; set; }
+    public bool IsEmailSent { get; set; }
+    public DateTime? ReminderDateTime { get; set; }
 
     // Navigation property for the Category relationship
     public Guid CategoryId { get; set; }
