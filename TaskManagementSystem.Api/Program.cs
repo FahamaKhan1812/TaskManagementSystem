@@ -5,6 +5,7 @@ using TaskManagementSystem.Api.Options;
 using NLog.Web;
 using NLog;
 using System.Text.Json;
+using TaskManagementSystem.Api.Middlewares;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 try
@@ -52,6 +53,7 @@ try
     app.UseHttpsRedirection();
 
     app.UseAuthentication();
+    
     app.UseStatusCodePages(async context =>
     {
         if (context.HttpContext.Response.StatusCode == 401)
@@ -71,6 +73,8 @@ try
 
 
     app.UseAuthorization();
+    
+    app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     app.MapControllers();
 
