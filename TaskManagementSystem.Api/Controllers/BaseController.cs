@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using TaskManagementSystem.Application.Contracts.Common;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
@@ -7,7 +7,14 @@ using TaskManagementSystem.Application.Models;
 namespace TaskManagementSystem.Api.Controllers;
 public class BaseController : ControllerBase
 {
-    protected IActionResult HandleErrorResponse(List<Error> errors) 
+    private readonly ILogger<BaseController> _logger;
+
+    public BaseController(ILogger<BaseController> logger)
+    {
+        _logger = logger;
+    }
+
+    protected IActionResult HandleErrorResponse(List<Error> errors)
     {
         ErrorResponse apiError = new();
         if (errors.Any(e => e.Code == ErrorCode.NotFound))
@@ -104,6 +111,8 @@ public class BaseController : ControllerBase
         apiError.StatusPhrase = "Server Error";
         apiError.Timestamp = DateTime.Now;
         apiError.Errors.Add("Unknown Error");
+
+        _logger.LogError(JsonSerializer.Serialize(apiError));
 
         return StatusCode(500, apiError);
     }

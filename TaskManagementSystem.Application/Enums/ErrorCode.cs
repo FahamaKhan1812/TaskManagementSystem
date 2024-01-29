@@ -6,6 +6,7 @@ public enum ErrorCode
 
     ValidationError = 101,
 
+    Ok = 200,
     IdentityUserAlreadyExists = 201,
     IdentityCreationFailed = 202,
     IdentityUserNotFound = 203,
