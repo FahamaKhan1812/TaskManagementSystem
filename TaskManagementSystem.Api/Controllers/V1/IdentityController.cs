@@ -17,7 +17,7 @@ public class IdentityController : BaseController
 {
     private readonly IMediator _mediator;
 
-    public IdentityController(IMediator mediator)
+    public IdentityController(IMediator mediator, ILogger<BaseController> logger) : base(logger)
     {
         _mediator = mediator;
     }

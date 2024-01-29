@@ -1,68 +1,44 @@
-﻿using MediatR;
+﻿using System.Linq.Expressions;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
 using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.IRepositories;
 
 namespace TaskManagementSystem.Application.Categories.CommandHandlers;
 public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, OperationResult<string>>
 {
-    private readonly DataContext _dataContext;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public DeleteCategoryCommandHandler(DataContext dataContext)
+    public DeleteCategoryCommandHandler(ICategoryRepository categoryRepository)
     {
-        _dataContext = dataContext;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<OperationResult<string>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {
-        var result = new OperationResult<string>();
         try
         {
-            var category = await _dataContext.Categories
-               .FirstOrDefaultAsync(c => c.Id == request.CategoryId, cancellationToken);
+            var category = await _categoryRepository.GetAsync(new Expression<Func<Category, bool>>[] { c => c.Id == request.CategoryId }, cancellationToken);
 
             if (category == null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.NotFound,
-                    Message = "No Category is found."
-                };
-                result.Errors.Add(error);
-                return result;
+                return OperationResult<string>.Failure(ErrorCode.NotFound,"No Category is found.");
             }
             if (request.UserRole == UserRole.User)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.UserNotAllowed,
-                    Message = "User is not allowed to perform this action"
-                };
-                result.Errors.Add(error);
-                return result;
+                return OperationResult<string>.Failure(ErrorCode.UserNotAllowed,"User is not allowed to perform this action");
             }
 
-            _dataContext.Categories.Remove(category);
-            await _dataContext.SaveChangesAsync(cancellationToken);
-            result.Payload = "Deleted successfully";
+            await _categoryRepository.DeleteAsync(category, cancellationToken);
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            return OperationResult<string>.Failure(ErrorCode.UnknownError,ex.Message);
         }
-
-        return result;
+        return OperationResult<string>.Success(ErrorCode.Ok, "Deleted successfully");
     }
 }

@@ -18,7 +18,7 @@ public class TasksController : BaseController
 {
     private readonly IMediator _mediator;
 
-    public TasksController(IMediator mediator)
+    public TasksController(IMediator mediator, ILogger<BaseController> logger) : base(logger)
     {
         _mediator = mediator;
     }
