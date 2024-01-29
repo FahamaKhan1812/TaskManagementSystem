@@ -7,6 +7,8 @@ using NLog;
 using NLog.LayoutRenderers;
 using TaskManagementSystem.Api;
 using System.Text.Json;
+using Hangfire;
+using TaskManagementSystem.Application.Notifications;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 try
@@ -20,7 +22,7 @@ try
     builder.Services.AddMSDb(builder.Configuration);
     builder.Services.AddIdentityDb();
     builder.Services.AddJwtAuthentication(builder.Configuration);
-    builder.Services.AddApplication();
+    builder.Services.AddApplication(builder.Configuration);
 
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
@@ -71,6 +73,18 @@ try
 
 
     app.UseAuthorization();
+
+    // Configure Hangfire dashboard
+    app.UseHangfireDashboard();
+
+    // Configure Hangfire server
+    app.UseHangfireServer();
+
+    // Schedule the EmailNotificationJob to run
+    RecurringJob.AddOrUpdate<EmailNotificationJob>("SendTaskReminders", job => job.Execute(), "0 */15 * * * ?");
+
+    // Every 15 mins => 0 */ 15 * ** ?
+    // Every 2 secs => 0/2 * * ? * *
 
     app.MapControllers();
 
