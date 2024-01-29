@@ -74,7 +74,7 @@ try
 
     app.UseAuthorization();
     
-    app.UseMiddleware<ExceptionHandlingMiddleware>();
+    //app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     app.MapControllers();
 

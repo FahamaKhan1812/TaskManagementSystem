@@ -25,6 +25,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Not Found";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return NotFound(apiError);
         }
@@ -37,6 +38,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Bad Request";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return BadRequest(apiError);
         }
@@ -49,6 +51,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Bad Request";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return BadRequest(apiError);
         }
@@ -61,6 +64,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Bad Request";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return BadRequest(apiError);
         }
@@ -73,6 +77,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Not Found";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return NotFound(apiError);
         }
@@ -85,6 +90,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Unauthenticated";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return new ObjectResult(apiError)
             {
@@ -100,6 +106,7 @@ public class BaseController : ControllerBase
             apiError.StatusPhrase = "Forbidden Request";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
+            _logger.LogError(JsonSerializer.Serialize(apiError));
 
             return new ObjectResult(apiError)
             {
