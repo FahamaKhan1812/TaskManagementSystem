@@ -25,8 +25,8 @@ public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<T
 
         try
         {
-            var pageCount = Math.Ceiling(_dataContext.Tasks.Count() / (float)request.PageSize);
-            var tasksWithCategoryName = await _dataContext.Tasks
+            var query = _dataContext.Tasks.AsQueryable();
+            var tasksWithCategoryName = await query
                     .OrderBy(t => t.Id)
                     .Skip((request.Page - 1) * request.PageSize)
                     .Take(request.PageSize)
@@ -34,9 +34,10 @@ public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<T
                     .Include(u => u.User)
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
-                
+
             var mappedData = _mapper.Map<List<TaskWithCategoryDetailsResponse>>(tasksWithCategoryName);
-            
+
+            var pageCount = Math.Ceiling(await query.CountAsync(cancellationToken) / (float)request.PageSize);
             TaskResponse obj = new()
             {
                 Pages = (int)pageCount,
