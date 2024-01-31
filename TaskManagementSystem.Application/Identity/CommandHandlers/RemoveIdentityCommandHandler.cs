@@ -23,26 +23,14 @@ internal class RemoveIdentityCommandHandler : IRequestHandler<RemoveIdentityComm
         {
             if (request.UserRole != UserRole.Admin)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.UserNotAllowed,
-                    Message = "User is not allowed to do specific operation"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
                 return result;
             }
 
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
             if (user == null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.NotFound,
-                    Message = "No User is found"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.NotFound, "No User is found");
                 return result;
             }
 
@@ -52,13 +40,7 @@ internal class RemoveIdentityCommandHandler : IRequestHandler<RemoveIdentityComm
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error errors = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-            result.Errors.Add(errors);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
         return result;
     }

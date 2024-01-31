@@ -6,6 +6,7 @@ using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Queries;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Entities;
 
 namespace TaskManagementSystem.Application.Identity.QueryHandlers;
 internal class GetAllIdentityHandler : IRequestHandler<GetAllIdentity, OperationResult<List<IdentityResponse>>>
@@ -25,15 +26,9 @@ internal class GetAllIdentityHandler : IRequestHandler<GetAllIdentity, Operation
 
         try
         {
-            if(request.UserRole != "Admin")
+            if(request.UserRole != UserRole.Admin)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.UserNotAllowed,
-                    Message = "User is not allowed to do specific operation"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
                 return result;
             }
             var identityUsers = await _dataContext.Users
@@ -45,14 +40,7 @@ internal class GetAllIdentityHandler : IRequestHandler<GetAllIdentity, Operation
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
         return result;
     }

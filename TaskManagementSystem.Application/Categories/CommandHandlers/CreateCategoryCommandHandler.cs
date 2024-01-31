@@ -36,13 +36,7 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
             };
             if (request.UserRole == UserRole.User)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.UserNotAllowed,
-                    Message = "User is not allowed to perform this action"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to perform this action");
                 return result;
             }
             await _dataContext.Categories.AddAsync(category, cancellationToken);
@@ -53,16 +47,9 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
             // Log the exception details
-            _logger.LogError(ex, $"An error occurred while creating category: {erros}");
+            _logger.LogError(ex, $"An error occurred while creating category: {@result.Errors}");
         }
 
         return result;

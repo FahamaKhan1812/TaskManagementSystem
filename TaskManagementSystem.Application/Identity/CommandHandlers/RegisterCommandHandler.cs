@@ -30,13 +30,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Operation
             // Check if the user is already exist or not
             if (existingIdentity != null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.IdentityUserAlreadyExists,
-                    Message = "Provided informations is already exists."
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.IdentityUserAlreadyExists, "Provided informations is already exists.");
                 return result;
             }
 
@@ -53,15 +47,9 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Operation
             if (!createdIdentity.Succeeded)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                result.IsError = true;
                 foreach (var identityErrors in createdIdentity.Errors)
                 {
-                    Error error = new()
-                    {
-                        Code = ErrorCode.IdentityCreationFailed,
-                        Message = identityErrors.Description
-                    };
-                    result.Errors.Add(error);
+                    result.AddError(ErrorCode.IdentityCreationFailed, identityErrors.Description);
                 }
                 return result;
             }
@@ -101,13 +89,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Operation
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error errors = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-            result.Errors.Add(errors);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
         return result;
     }

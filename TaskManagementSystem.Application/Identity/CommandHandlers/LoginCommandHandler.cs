@@ -37,26 +37,14 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
             var identityUser = await _userManager.FindByEmailAsync(request.UserName);
             if(identityUser == null) 
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.IdentityUserNotFound,
-                    Message = "Invalid Credentials."
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.IdentityUserNotFound, "Invalid Credentials.");
                 return result;
             }
 
             var validPassword = await _userManager.CheckPasswordAsync(identityUser, request.Password);
             if (!validPassword)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.IncorrectPassword,
-                    Message = "Invalid Credentials."
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.IncorrectPassword, "Invalid Credentials.");
                 return result;
             }
             var userRoles = await _userManager.GetRolesAsync(identityUser);
@@ -71,13 +59,8 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error errors = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-            result.Errors.Add(errors);
+
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
 
         return result;
@@ -87,12 +70,12 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
     {
         var claimsIdentity = new ClaimsIdentity(new Claim[]
         {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()),
-                new Claim("UserId", user.Id),
-                new Claim(ClaimTypes.Role, userRolesList)
+                new(JwtRegisteredClaimNames.Sub, user.Email),
+                new(JwtRegisteredClaimNames.Email, user.Email),
+                new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString()),
+                new("UserId", user.Id),
+                new(ClaimTypes.Role, userRolesList)
          });
         var token = _identityServices.CreateSecurityToken(claimsIdentity);
         return _identityServices.WriteToken(token);

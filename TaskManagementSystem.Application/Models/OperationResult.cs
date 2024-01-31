@@ -3,46 +3,44 @@
 namespace TaskManagementSystem.Application.Models;
 public class OperationResult<T>
 {
-    public bool IsError { get; set; }
-    public ErrorCode Code { get; set; }
-    public T? Payload { get; set; } = default;
-    public List<Error> Errors { get; set; } = new List<Error>();
+    public T Payload { get; set; }
+    public bool IsError { get; private set; }
+    public List<Error> Errors { get; } = new List<Error>();
 
-    public OperationResult()
+    /// <summary>
+    /// Adds an error to the Error list and sets the IsError flag to true
+    /// </summary>
+    /// <param name="code"></param>
+    /// <param name="message"></param>
+    public void AddError(ErrorCode code, string message)
     {
-        
-    }
-
-    private OperationResult(bool isError, ErrorCode code,T payload, List<Error> errors)
-    {
-        Code = code;
-        IsError = isError;
-        Payload = payload;
-        Errors = errors;
+        HandleError(code, message);
     }
 
-    private OperationResult(bool isError,ErrorCode code,T payload)
+    /// <summary>
+    /// Adds a default error to the Error list with the error code UnknownError
+    /// </summary>
+    /// <param name="message"></param>
+    public void AddUnknownError(string message)
     {
-        Code = code;
-        IsError = isError;
-        Payload = payload;
+        HandleError(ErrorCode.UnknownError, message);
     }
 
-    public static OperationResult<T> Success(ErrorCode code ,T payload, List<Error> errors)
+    /// <summary>
+    /// Sets the IsError flag to default (false)
+    /// </summary>
+    public void ResetIsErrorFlag()
     {
-        return new(false,code, payload, errors);
-    }
-    public static OperationResult<T> Success(ErrorCode code ,T payload)
-    {
-        return new(false,code, payload);
-    }
-    public static OperationResult<T> Failure(ErrorCode code, T payload, List<Error> errors)
-    {
-        return new(true,code, payload, errors);
-    }
-    public static OperationResult<T> Failure(ErrorCode code, T payload)
-    {
-        return new(true,code, payload);
+        IsError = false;
     }
 
+    #region Private methods
+
+    private void HandleError(ErrorCode code, string message)
+    {
+        Errors.Add(new Error { Code = code, Message = message });
+        IsError = true;
+    }
+
+    #endregion
 }

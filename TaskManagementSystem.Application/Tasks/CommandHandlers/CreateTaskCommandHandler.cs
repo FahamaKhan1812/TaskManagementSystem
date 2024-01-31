@@ -44,14 +44,7 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Opera
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
         return result;
     }

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Enums;
@@ -20,25 +21,29 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
 
     public async Task<OperationResult<string>> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
     {
+        var result = new OperationResult<string>();
         try
         {
             var category = await _categoryRepository.GetAsync(new Expression<Func<Category, bool>>[] { c => c.Id == request.CategoryId }, cancellationToken);
 
             if (category == null)
             {
-                return OperationResult<string>.Failure(ErrorCode.NotFound,"No Category is found.");
+                result.AddError(ErrorCode.NotFound, "No Category is found.");
+                return result;
             }
             if (request.UserRole == UserRole.User)
             {
-                return OperationResult<string>.Failure(ErrorCode.UserNotAllowed,"User is not allowed to perform this action");
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
+                return result;
             }
 
             await _categoryRepository.DeleteAsync(category, cancellationToken);
         }
         catch (Exception ex)
         {
-            return OperationResult<string>.Failure(ErrorCode.UnknownError,ex.Message);
+            result.AddError(ErrorCode.UnknownError, ex.Message); 
+            return result;
         }
-        return OperationResult<string>.Success(ErrorCode.Ok, "Deleted successfully");
+        return result;
     }
 }

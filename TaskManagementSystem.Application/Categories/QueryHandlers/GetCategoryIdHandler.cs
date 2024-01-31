@@ -28,13 +28,7 @@ public class GetCategoryIdHandler : IRequestHandler<GetCategoryById, OperationRe
 
             if(category == null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.NotFound,
-                    Message = "No Category is found."
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.NotFound, "No Category is found.");
                 return result;
             }
             var mappedCategory = _mapper.Map<CategoryResponse>(category);
@@ -43,14 +37,7 @@ public class GetCategoryIdHandler : IRequestHandler<GetCategoryById, OperationRe
 		}
 		catch (Exception ex)
 		{
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
 
         return result;

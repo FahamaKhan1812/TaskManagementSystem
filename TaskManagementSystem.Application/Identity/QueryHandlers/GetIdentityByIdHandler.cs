@@ -6,6 +6,7 @@ using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Queries;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Entities;
 
 namespace TaskManagementSystem.Application.Identity.QueryHandlers;
 internal class GetIdentityByIdHandler : IRequestHandler<GetIdentityById, OperationResult<IdentityResponse>>
@@ -24,28 +25,16 @@ internal class GetIdentityByIdHandler : IRequestHandler<GetIdentityById, Operati
         var result = new OperationResult<IdentityResponse>();
         try
         {
-            if (request.UserRole != "Admin")
+            if (request.UserRole != UserRole.Admin)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.UserNotAllowed,
-                    Message = "User is not allowed to do specific operation"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
                 return result;
             }
             var identity = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserId == request.IdentityId, cancellationToken);
             
             if(identity == null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.IdentityUserNotFound,
-                    Message = "No Identity is found"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.IdentityUserNotFound, "No Identity is found");
                 return result;
             }
 
@@ -54,14 +43,7 @@ internal class GetIdentityByIdHandler : IRequestHandler<GetIdentityById, Operati
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
         return result;
     }

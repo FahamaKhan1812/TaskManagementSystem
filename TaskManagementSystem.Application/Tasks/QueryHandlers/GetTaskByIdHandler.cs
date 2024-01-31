@@ -30,13 +30,7 @@ internal class GetTaskByIdHandler : IRequestHandler<GetTaskById, OperationResult
                 .FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
             if(task is null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.NotFound,
-                    Message = "No task is found."
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.NotFound, "No task is found.");
                 return result;
             }
             var mappedTask = _mapper.Map<TaskWithCategoryDetailsResponse>(task);
@@ -44,14 +38,7 @@ internal class GetTaskByIdHandler : IRequestHandler<GetTaskById, OperationResult
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
 
         return result;

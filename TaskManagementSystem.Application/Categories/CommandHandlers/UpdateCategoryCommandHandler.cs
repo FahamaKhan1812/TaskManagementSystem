@@ -30,25 +30,13 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
 
             if (category == null)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.NotFound,
-                    Message = "No Category is found."
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.NotFound, "No Category is found.");
                 return result;
             }
 
             if (request.UserRole == UserRole.User)
             {
-                result.IsError = true;
-                Error error = new()
-                {
-                    Code = ErrorCode.UserNotAllowed,
-                    Message = "User is not allowed to perform this action"
-                };
-                result.Errors.Add(error);
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to perform this action");
                 return result;
             }
 
@@ -62,14 +50,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
         }
         catch (Exception ex)
         {
-            result.IsError = true;
-            Error erros = new()
-            {
-                Code = ErrorCode.UnknownError,
-                Message = ex.Message
-            };
-
-            result.Errors.Add(erros);
+            result.AddError(ErrorCode.UnknownError, ex.Message);
         }
 
         return result;
