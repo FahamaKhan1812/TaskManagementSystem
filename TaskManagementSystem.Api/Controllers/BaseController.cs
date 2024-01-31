@@ -34,13 +34,13 @@ public class BaseController : ControllerBase
         {
             var error = errors.FirstOrDefault(e => e.Code == ErrorCode.IdentityUserAlreadyExists);
 
-            apiError.StatusCode = 400;
-            apiError.StatusPhrase = "Bad Request";
+            apiError.StatusCode = 409;
+            apiError.StatusPhrase = "Conflict";
             apiError.Timestamp = DateTime.Now;
             apiError.Errors.Add(error.Message);
             _logger.LogError(JsonSerializer.Serialize(apiError));
 
-            return BadRequest(apiError);
+            return Conflict(apiError);
         }
 
         if (errors.Any(e => e.Code == ErrorCode.IdentityCreationFailed))
