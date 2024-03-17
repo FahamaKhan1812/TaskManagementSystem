@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using TaskManagementSystem.Application.Services;
 using TaskManagementSystem.DAL.Data;
 
@@ -8,14 +9,16 @@ public sealed class EmailNotificationJob
 {
     private readonly DataContext _dataContext;
     private readonly IEmailService _emailService;
+    private readonly ILogger<EmailNotificationJob> _logger;
 
-    public EmailNotificationJob(DataContext dataContext, IEmailService emailService)
+    public EmailNotificationJob(DataContext dataContext, IEmailService emailService, ILogger<EmailNotificationJob> logger)
     {
         _dataContext = dataContext;
         _emailService = emailService;
+        _logger = logger;
     }
 
-    private async Task<List<Domain.Entities.Task>> GetAllTasks(CancellationToken cancellationToken)
+    private async Task<List<Domain.Tasks.Task>> GetAllTasks(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -36,7 +39,7 @@ public sealed class EmailNotificationJob
         try
         {
             // Get all tasks
-            var tasks = await GetAllTasks(CancellationToken.None);
+            var tasks = await GetAllTasks();
 
             foreach (var task in tasks)
             {
@@ -63,8 +66,7 @@ public sealed class EmailNotificationJob
         }
         catch (Exception ex)
         {
-            // Handle exceptions accordingly (log, throw, etc.)
-            Console.WriteLine($"Error executing EmailNotificationJob: {ex.Message}");
+            _logger.LogError($"Error sending email: {ex.Message}");
         }
     }
 

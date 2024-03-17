@@ -1,23 +1,23 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Contracts.Identity.Response;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Queries;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Commons;
+using TaskManagementSystem.Domain.Users;
 
 namespace TaskManagementSystem.Application.Identity.QueryHandlers;
-internal class GetAllIdentityHandler : IRequestHandler<GetAllIdentity, OperationResult<List<IdentityResponse>>>
+
+internal sealed class GetAllIdentityHandler : IRequestHandler<GetAllIdentity, OperationResult<List<IdentityResponse>>>
 {
-    private readonly DataContext _dataContext;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
 
-    public GetAllIdentityHandler(DataContext dataContext, IMapper mapper)
+    public GetAllIdentityHandler(IMapper mapper, IUserRepository userRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _userRepository = userRepository;
     }
 
     public async Task<OperationResult<List<IdentityResponse>>> Handle(GetAllIdentity request, CancellationToken cancellationToken)
@@ -26,14 +26,12 @@ internal class GetAllIdentityHandler : IRequestHandler<GetAllIdentity, Operation
 
         try
         {
-            if(request.UserRole != UserRole.Admin)
+            if (request.UserRole != UserRole.Admin)
             {
                 result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
                 return result;
             }
-            var identityUsers = await _dataContext.Users
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            var identityUsers = await _userRepository.GetAllAsync(cancellationToken);
             var mappedData = _mapper.Map<List<IdentityResponse>>(identityUsers);
             result.Payload = mappedData;
 

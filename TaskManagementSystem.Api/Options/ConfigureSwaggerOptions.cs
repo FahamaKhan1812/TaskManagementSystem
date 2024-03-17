@@ -5,7 +5,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace TaskManagementSystem.Api.Options;
-public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+internal sealed class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 {
     private readonly IApiVersionDescriptionProvider _provider;
     public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
@@ -36,7 +36,7 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
         };
 
         // Check for the deprecated version
-        if(apiVersion.IsDeprecated)
+        if (apiVersion.IsDeprecated)
         {
             info.Description = "This api has been deprecated";
         }

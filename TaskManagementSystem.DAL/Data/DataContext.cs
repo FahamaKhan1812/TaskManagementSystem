@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Categories;
+using TaskManagementSystem.Domain.Users;
 
 namespace TaskManagementSystem.DAL.Data;
 public class DataContext : IdentityDbContext
@@ -10,12 +11,12 @@ public class DataContext : IdentityDbContext
     }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<Domain.Entities.Task> Tasks { get; set; }
+    public DbSet<Domain.Tasks.Task> Tasks { get; set; }
     public DbSet<Category> Categories { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         // Configure the Task-Category relationship
-        builder.Entity<Domain.Entities.Task>()
+        builder.Entity<Domain.Tasks.Task>()
             .HasOne(t => t.Category)
             .WithMany(c => c.Tasks)
             .HasForeignKey(t => t.CategoryId)

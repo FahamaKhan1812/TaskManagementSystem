@@ -1,16 +1,12 @@
-﻿using System.Linq.Expressions;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using System.Linq.Expressions;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
-using TaskManagementSystem.Domain.IRepositories;
+using TaskManagementSystem.Domain.Categories;
 
 namespace TaskManagementSystem.Application.Categories.CommandHandlers;
-public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, OperationResult<string>>
+internal sealed class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, OperationResult<string>>
 {
     private readonly ICategoryRepository _categoryRepository;
 
@@ -24,6 +20,13 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
         var result = new OperationResult<string>();
         try
         {
+            var isUserAdmin = _categoryRepository.IsUserAdmin(request.UserRole);
+            if (!isUserAdmin)
+            {
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
+                return result;
+            }
+
             var category = await _categoryRepository.GetAsync(new Expression<Func<Category, bool>>[] { c => c.Id == request.CategoryId }, cancellationToken);
 
             if (category == null)
@@ -31,17 +34,13 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
                 result.AddError(ErrorCode.NotFound, "No Category is found.");
                 return result;
             }
-            if (request.UserRole == UserRole.User)
-            {
-                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
-                return result;
-            }
 
             await _categoryRepository.DeleteAsync(category, cancellationToken);
+            result.Payload = "Deleted successfully";
         }
         catch (Exception ex)
         {
-            result.AddError(ErrorCode.UnknownError, ex.Message); 
+            result.AddError(ErrorCode.UnknownError, ex.Message);
             return result;
         }
         return result;

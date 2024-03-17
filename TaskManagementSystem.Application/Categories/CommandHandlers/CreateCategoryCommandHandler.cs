@@ -1,27 +1,21 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.Extensions.Logging;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Contracts.Category.Request;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Categories;
 
 namespace TaskManagementSystem.Application.Categories.CommandHandlers;
-public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, OperationResult<CreateCategory>>
+internal sealed class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, OperationResult<CreateCategory>>
 {
-    private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
-    private readonly ILogger<CreateCategoryCommandHandler> _logger;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public CreateCategoryCommandHandler(DataContext dataContext,
-                                        IMapper mapper,
-                                        ILogger<CreateCategoryCommandHandler> logger)
+    public CreateCategoryCommandHandler(IMapper mapper, ICategoryRepository categoryRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
-        _logger = logger;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<OperationResult<CreateCategory>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
@@ -29,27 +23,24 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
         var result = new OperationResult<CreateCategory>();
         try
         {
+            var isUserAdmin = _categoryRepository.IsUserAdmin(request.UserRole);
+            if (!isUserAdmin)
+            {
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
+                return result;
+            }
             Category category = new()
             {
                 Id = request.Id,
                 Name = request.Name,
             };
-            if (request.UserRole == UserRole.User)
-            {
-                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to perform this action");
-                return result;
-            }
-            await _dataContext.Categories.AddAsync(category, cancellationToken);
-            await _dataContext.SaveChangesAsync(cancellationToken);
+            await _categoryRepository.AddAsync(category, cancellationToken);
             var mappedCategory = _mapper.Map<CreateCategory>(category);
-
             result.Payload = mappedCategory;
         }
         catch (Exception ex)
         {
             result.AddError(ErrorCode.UnknownError, ex.Message);
-            // Log the exception details
-            _logger.LogError(ex, $"An error occurred while creating category: {@result.Errors}");
         }
 
         return result;

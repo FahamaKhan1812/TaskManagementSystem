@@ -4,7 +4,8 @@ using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Commands;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Commons;
+using TaskManagementSystem.Domain.Users;
 
 namespace TaskManagementSystem.Application.Identity.CommandHandlers;
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, OperationResult<string>>

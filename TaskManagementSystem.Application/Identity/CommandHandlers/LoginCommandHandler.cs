@@ -1,31 +1,22 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Commands;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.Application.Options;
 using TaskManagementSystem.Application.Services;
-using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
 
 namespace TaskManagementSystem.Application.Identity.CommandHandlers;
 internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResult<string>>
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IdentityServices _identityServices;
-    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public LoginCommandHandler(UserManager<IdentityUser> userManager, IdentityServices identityServices, RoleManager<IdentityRole> roleManager)
+    public LoginCommandHandler(UserManager<IdentityUser> userManager, IdentityServices identityServices)
     {
         _userManager = userManager;
         _identityServices = identityServices;
-        _roleManager = roleManager;
     }
 
     public async Task<OperationResult<string>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -35,7 +26,7 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
         try
         {
             var identityUser = await _userManager.FindByEmailAsync(request.UserName);
-            if(identityUser == null) 
+            if (identityUser == null)
             {
                 result.AddError(ErrorCode.IdentityUserNotFound, "Invalid Credentials.");
                 return result;
@@ -52,8 +43,8 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
             {
                 result.Payload = GenerateJwt(identityUser, userRoles[0]);
             }
-            else 
-            { 
+            else
+            {
                 result.Payload = GenerateJwt(identityUser);
             }
         }
@@ -66,7 +57,7 @@ internal class LoginCommandHandler : IRequestHandler<LoginCommand, OperationResu
         return result;
     }
 
-    private string GenerateJwt(IdentityUser user, string userRolesList="User")
+    private string GenerateJwt(IdentityUser user, string userRolesList = "User")
     {
         var claimsIdentity = new ClaimsIdentity(new Claim[]
         {

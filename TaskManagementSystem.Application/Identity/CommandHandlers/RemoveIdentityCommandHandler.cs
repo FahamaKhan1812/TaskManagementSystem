@@ -4,7 +4,7 @@ using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Commands;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Commons;
 
 namespace TaskManagementSystem.Application.Identity.CommandHandlers;
 internal class RemoveIdentityCommandHandler : IRequestHandler<RemoveIdentityCommand, OperationResult<string>>

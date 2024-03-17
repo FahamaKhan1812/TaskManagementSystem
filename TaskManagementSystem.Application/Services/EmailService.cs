@@ -1,5 +1,6 @@
-﻿using System.Net.Mail;
+﻿using Microsoft.Extensions.Logging;
 using System.Net;
+using System.Net.Mail;
 
 namespace TaskManagementSystem.Application.Services;
 internal class EmailService : IEmailService
@@ -8,6 +9,12 @@ internal class EmailService : IEmailService
     private readonly int smtpPort = 587;
     private readonly string smtpUsername = "fahamakhan3@gmail.com"; // replace with your SMTP username
     private readonly string smtpPassword = "kfnjqmchapwompfr"; // replace with your SMTP password
+    private readonly ILogger<EmailService> _logger;
+
+    public EmailService(ILogger<EmailService> logger)
+    {
+        _logger = logger;
+    }
 
     public async Task SendEmailAsync(string toEmail, string subject, string body)
     {
@@ -32,11 +39,11 @@ internal class EmailService : IEmailService
             mailMessage.To.Add(toEmail);
 
             await smtpClient.SendMailAsync(mailMessage);
+            _logger.LogInformation($"Email sent Successfully at: {DateTime.Now}");
         }
         catch (Exception ex)
         {
-            // Handle exceptions accordingly (log, throw, etc.)
-            Console.WriteLine($"Error sending email: {ex.Message}");
+            _logger.LogError($"Error sending email: {ex.Message}");
         }
     }
 }

@@ -5,7 +5,7 @@ using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 
 namespace TaskManagementSystem.Api.Controllers;
-public class BaseController : ControllerBase
+internal abstract class BaseController : ControllerBase
 {
     private readonly ILogger<BaseController> _logger;
 

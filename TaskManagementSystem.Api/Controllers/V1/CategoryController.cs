@@ -1,14 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementSystem.Api.Extensions;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Categories.Queries;
 using TaskManagementSystem.Application.Contracts.Category.Request;
-using TaskManagementSystem.Application.Tasks.Queries;
-using TaskManagementSystem.Domain.Entities;
 
 namespace TaskManagementSystem.Api.Controllers.V1;
 
@@ -16,7 +13,7 @@ namespace TaskManagementSystem.Api.Controllers.V1;
 [Route(ApiRoutes.BaseRoute)]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class CategoryController : BaseController
+internal class CategoryController : BaseController
 {
     private readonly IMediator _mediator;
 
@@ -40,7 +37,7 @@ public class CategoryController : BaseController
         var response = await _mediator.Send(query);
         return response.IsError ? HandleErrorResponse(response.Errors) : Ok(response.Payload);
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> CreateCategory([FromBody] CreateCategory request)
     {
@@ -73,7 +70,7 @@ public class CategoryController : BaseController
     public async Task<IActionResult> DeleteCategory(Guid id)
     {
         var userRole = HttpContext.GetUserRole();
-        var command = new DeleteCategoryCommand() 
+        var command = new DeleteCategoryCommand()
         {
             CategoryId = id,
             UserRole = userRole!

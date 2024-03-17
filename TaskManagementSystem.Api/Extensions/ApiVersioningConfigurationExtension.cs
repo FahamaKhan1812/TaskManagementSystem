@@ -3,7 +3,7 @@
 namespace TaskManagementSystem.Api.Extensions;
 public static class ApiVersioningConfigurationExtension
 {
-    public static void AddApiVersion(this IServiceCollection services) 
+    public static void AddApiVersion(this IServiceCollection services)
     {
         services.AddApiVersioning(opt =>
         {

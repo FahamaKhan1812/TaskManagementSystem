@@ -1,23 +1,22 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TaskManagementSystem.Application.Categories.Commads;
 using TaskManagementSystem.Application.Contracts.Category.Request;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Categories;
 
 namespace TaskManagementSystem.Application.Categories.CommandHandlers;
-public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, OperationResult<UpdateCategory>>
+internal sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, OperationResult<UpdateCategory>>
 {
-    private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public UpdateCategoryCommandHandler(DataContext dataContext, IMapper mapper)
+    public UpdateCategoryCommandHandler(IMapper mapper, ICategoryRepository categoryRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<OperationResult<UpdateCategory>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
@@ -25,8 +24,13 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
         var result = new OperationResult<UpdateCategory>();
         try
         {
-            var category = await _dataContext.Categories
-               .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+            var isUserAdmin = _categoryRepository.IsUserAdmin(request.UserRole);
+            if (!isUserAdmin)
+            {
+                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
+                return result;
+            }
+            var category = await _categoryRepository.GetAsync(new Expression<Func<Category, bool>>[] { c => c.Id == request.Id }, cancellationToken);
 
             if (category == null)
             {
@@ -34,15 +38,8 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
                 return result;
             }
 
-            if (request.UserRole == UserRole.User)
-            {
-                result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to perform this action");
-                return result;
-            }
-
             category.Name = request.Name;
-            await _dataContext.SaveChangesAsync(cancellationToken);
-
+            await _categoryRepository.UpdateAsync(category, cancellationToken);
             var mappedCategory = _mapper.Map<UpdateCategory>(category);
 
             result.Payload = mappedCategory;

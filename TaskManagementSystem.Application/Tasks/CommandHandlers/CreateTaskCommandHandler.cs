@@ -4,18 +4,18 @@ using TaskManagementSystem.Application.Contracts.Task.Request;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.Application.Tasks.Commands;
-using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Tasks;
 
 namespace TaskManagementSystem.Application.Tasks.CommandHandlers;
 public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, OperationResult<CreateTask>>
 {
-    private readonly DataContext _dataContext;
+    private readonly ITaskRepository _taskRepository;
     private readonly IMapper _mapper;
 
-    public CreateTaskCommandHandler(DataContext dataContext, IMapper mapper)
+    public CreateTaskCommandHandler(IMapper mapper, ITaskRepository taskRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _taskRepository = taskRepository;
     }
 
     public async Task<OperationResult<CreateTask>> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Opera
         var result = new OperationResult<CreateTask>();
         try
         {
-            Domain.Entities.Task task = new()
+            Domain.Tasks.Task task = new()
             {
                 Id = request.Id,
                 Description = request.Description,
@@ -35,11 +35,11 @@ public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Opera
                 UpdatedDate = request.UpdatedDate,
                 UserProfileId = request.UserId
             };
-            await _dataContext.Tasks.AddAsync(task, cancellationToken);
-            await _dataContext.SaveChangesAsync(cancellationToken);
+
+            await _taskRepository.AddAsync(task, cancellationToken);
 
             var mappedTask = _mapper.Map<CreateTask>(task);
-            
+
             result.Payload = mappedTask;
         }
         catch (Exception ex)

@@ -1,32 +1,32 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TaskManagementSystem.Application.Categories.Queries;
 using TaskManagementSystem.Application.Contracts.Category.Response;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Categories;
 
 namespace TaskManagementSystem.Application.Categories.QueryHandlers;
-public class GetCategoryIdHandler : IRequestHandler<GetCategoryById, OperationResult<CategoryResponse>>
+
+internal sealed class GetCategoryIdHandler : IRequestHandler<GetCategoryById, OperationResult<CategoryResponse>>
 {
-    private readonly DataContext _dataContext;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IMapper _mapper;
-    public GetCategoryIdHandler(DataContext dataContext, IMapper mapper)
+    public GetCategoryIdHandler(IMapper mapper, ICategoryRepository categoryRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<OperationResult<CategoryResponse>> Handle(GetCategoryById request, CancellationToken cancellationToken)
     {
         var result = new OperationResult<CategoryResponse>();
-		try
-		{
-            var category = await _dataContext.Categories
-                .FirstOrDefaultAsync(c => c.Id == request.CategoryId, cancellationToken);
+        try
+        {
+            var category = await _categoryRepository.GetAsync(new Expression<Func<Category, bool>>[] { c => c.Id == request.CategoryId }, cancellationToken);
 
-            if(category == null)
+            if (category == null)
             {
                 result.AddError(ErrorCode.NotFound, "No Category is found.");
                 return result;
@@ -34,9 +34,9 @@ public class GetCategoryIdHandler : IRequestHandler<GetCategoryById, OperationRe
             var mappedCategory = _mapper.Map<CategoryResponse>(category);
             result.Payload = mappedCategory;
 
-		}
-		catch (Exception ex)
-		{
+        }
+        catch (Exception ex)
+        {
             result.AddError(ErrorCode.UnknownError, ex.Message);
         }
 

@@ -1,7 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Contracts.Common;
 
 namespace TaskManagementSystem.Api.Middlewares;
@@ -28,18 +27,18 @@ public class ExceptionHandlingMiddleware
             await HandleExceptionAsync(httpContext, ex);
         }
     }
-    
+
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         var response = context.Response;
         response.ContentType = "application/json";
-    
+
         var apiError = new ErrorResponse
         {
             Timestamp = DateTime.Now,
             Errors = new List<string> { exception.Message }
         };
-    
+
         switch (exception)
         {
             case ApplicationException:
@@ -75,9 +74,9 @@ public class ExceptionHandlingMiddleware
                 apiError.StatusPhrase = "Internal Server Error";
                 break;
         }
-    
+
         _logger.LogError(exception, JsonSerializer.Serialize(apiError));
-    
+
         response.StatusCode = apiError.StatusCode;
         await response.WriteAsync(JsonSerializer.Serialize(apiError));
     }
