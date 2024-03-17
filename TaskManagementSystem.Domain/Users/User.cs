@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagementSystem.Domain.Entities;
+namespace TaskManagementSystem.Domain.Users;
 public class User
 {
     [Key]
@@ -11,5 +11,5 @@ public class User
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
     public string Role { get; set; }
-    public ICollection<Task> Tasks { get; set; }
+    public ICollection<Tasks.Task> Tasks { get; set; }
 }

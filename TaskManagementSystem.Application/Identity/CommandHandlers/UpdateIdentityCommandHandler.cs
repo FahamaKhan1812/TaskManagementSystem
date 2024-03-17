@@ -4,7 +4,7 @@ using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Identity.Commands;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Commons;
 
 namespace TaskManagementSystem.Application.Identity.CommandHandlers;
 internal class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdentityCommand, OperationResult<string>>
@@ -26,17 +26,17 @@ internal class UpdateIdentityCommandHandler : IRequestHandler<UpdateIdentityComm
             }
 
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserId == request.UserId, cancellationToken);
-            if(user == null)
+            if (user == null)
             {
                 result.AddError(ErrorCode.NotFound, "No User is found.");
                 return result;
             }
 
             user.Email = request.UserName;
-            user.FirstName = request.FirstName; 
+            user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.UpdatedDate = request.UpdatedAt;
-            
+
             _dataContext.Users.Update(user);
             await _dataContext.SaveChangesAsync(cancellationToken);
             result.Payload = "User updated successfully";

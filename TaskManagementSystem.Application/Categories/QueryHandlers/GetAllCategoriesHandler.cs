@@ -1,23 +1,21 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Categories.Queries;
 using TaskManagementSystem.Application.Contracts.Category.Response;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
-using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Categories;
 
 namespace TaskManagementSystem.Application.Categories.QueryHandlers;
-public class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, OperationResult<List<CategoryResponse>>>
+internal sealed class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, OperationResult<List<CategoryResponse>>>
 {
-    private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public GetAllCategoriesHandler(DataContext dataContext, IMapper mapper)
+    public GetAllCategoriesHandler(IMapper mapper, ICategoryRepository categoryRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<OperationResult<List<CategoryResponse>>> Handle(GetAllCategories request, CancellationToken cancellationToken)
@@ -26,7 +24,7 @@ public class GetAllCategoriesHandler : IRequestHandler<GetAllCategories, Operati
 
         try
         {
-            var categories= await _dataContext.Categories.ToListAsync(cancellationToken);
+            var categories = await _categoryRepository.GetAllAsync(cancellationToken);
             var mappedcategories = _mapper.Map<List<CategoryResponse>>(categories);
             result.Payload = mappedcategories;
         }

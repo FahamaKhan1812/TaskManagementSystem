@@ -1,22 +1,21 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Application.Contracts.Task.Response;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.Application.Tasks.Queries;
-using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Tasks;
 
 namespace TaskManagementSystem.Application.Tasks.QueryHandlers;
 public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<TaskResponse>>
 {
-    private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
+    private readonly ITaskRepository _taskRepository;
 
-    public GetAllTasksHandler(DataContext dataContext, IMapper mapper)
+    public GetAllTasksHandler(IMapper mapper, ITaskRepository taskRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _taskRepository = taskRepository;
     }
 
     public async Task<OperationResult<TaskResponse>> Handle(GetAllTasks request, CancellationToken cancellationToken)
@@ -25,19 +24,11 @@ public class GetAllTasksHandler : IRequestHandler<GetAllTasks, OperationResult<T
 
         try
         {
-            var query = _dataContext.Tasks.AsQueryable();
-            var tasksWithCategoryName = await query
-                    .OrderBy(t => t.Id)
-                    .Skip((request.Page - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .Include(t => t.Category) // Include the Category navigation property
-                    .Include(u => u.User)
-                    .AsNoTracking()
-                    .ToListAsync(cancellationToken);
+            var tasks = await _taskRepository.GetAllAsync(request.Page, request.PageSize, cancellationToken);
 
-            var mappedData = _mapper.Map<List<TaskWithCategoryDetailsResponse>>(tasksWithCategoryName);
+            var pageCount = Math.Ceiling(tasks.Count / (float)request.PageSize);
 
-            var pageCount = Math.Ceiling(await query.CountAsync(cancellationToken) / (float)request.PageSize);
+            var mappedData = _mapper.Map<List<TaskWithCategoryDetailsResponse>>(tasks);
             TaskResponse obj = new()
             {
                 Pages = (int)pageCount,

@@ -1,13 +1,22 @@
 using TaskManagementSystem.DAL.Data;
-using TaskManagementSystem.Domain.Entities;
-using TaskManagementSystem.Domain.IRepositories;
+using TaskManagementSystem.Domain.Categories;
+using TaskManagementSystem.Domain.Commons;
 
 namespace TaskManagementSystem.DAL.Repositories;
 
-public class CategoryRepository
-    : Repository<Category> , ICategoryRepository
+public sealed class CategoryRepository
+    : Repository<Category>, ICategoryRepository
 {
     public CategoryRepository(DataContext dbContext) : base(dbContext)
     {
+    }
+
+    public bool IsUserAdmin(string role)
+    {
+        if (role == UserRole.Admin)
+        {
+            return true;
+        }
+        return false;
     }
 }

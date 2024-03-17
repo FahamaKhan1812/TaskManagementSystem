@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using TaskManagementSystem.Application.Contracts.Category.Request;
 using TaskManagementSystem.Application.Contracts.Category.Response;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Categories;
 
 namespace TaskManagementSystem.Application.MappingProfiles;
 public class CategoryMapping : Profile

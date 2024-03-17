@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using TaskManagementSystem.Application.Contracts.Identity.Response;
 using TaskManagementSystem.Application.Models;
 
 namespace TaskManagementSystem.Application.Identity.Commands;

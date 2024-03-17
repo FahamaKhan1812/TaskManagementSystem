@@ -1,4 +1,4 @@
-﻿namespace TaskManagementSystem.Domain.Entities;
+﻿namespace TaskManagementSystem.Domain.Commons;
 public class UserRole
 {
     public const string Admin = "Admin";

@@ -11,7 +11,7 @@ public class TaskWithCategoryDetailsResponse
     public bool IsCompleted { get; set; }
 
     // Details of the associated category
-    public Domain.Entities.Category Category { get; set; }
+    public Domain.Categories.Category Category { get; set; }
     public UserObj User { get; set; }
 }
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using TaskManagementSystem.Application.Contracts.Identity.Response;
-using TaskManagementSystem.Domain.Entities;
+using TaskManagementSystem.Domain.Users;
 
 namespace TaskManagementSystem.Application.MappingProfiles;
 internal class IdentityMapping : Profile

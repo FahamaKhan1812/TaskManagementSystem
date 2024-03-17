@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace TaskManagementSystem.Domain.Entities;
+namespace TaskManagementSystem.Domain.Categories;
 public class Category
 {
     [Key]
@@ -10,5 +10,5 @@ public class Category
 
     // Navigation property for the Task relationship
     [JsonIgnore]
-    public ICollection<Task> Tasks { get; set; }
+    public ICollection<Domain.Tasks.Task> Tasks { get; set; }
 }

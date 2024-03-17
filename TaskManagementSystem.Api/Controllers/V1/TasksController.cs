@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementSystem.Api.Extensions;
 using TaskManagementSystem.Application.Contracts.Task.Request;
@@ -14,7 +13,7 @@ namespace TaskManagementSystem.Api.Controllers.V1;
 [Route(ApiRoutes.BaseRoute)]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class TasksController : BaseController
+internal class TasksController : BaseController
 {
     private readonly IMediator _mediator;
 
@@ -77,13 +76,13 @@ public class TasksController : BaseController
         var result = await _mediator.Send(command);
         return result.IsError ? HandleErrorResponse(result.Errors) : NoContent();
     }
-    
+
     [HttpDelete(ApiRoutes.Tasks.IdRoute)]
     public async Task<IActionResult> DeleteTask(Guid id)
     {
         var userClaim = HttpContext.GetUserProfileIdClaimValue();
-        var command = new DeleteTaskCommand() 
-        { 
+        var command = new DeleteTaskCommand()
+        {
             TaskId = id,
             UserId = userClaim
         };

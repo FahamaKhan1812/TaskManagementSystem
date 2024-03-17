@@ -1,22 +1,22 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using TaskManagementSystem.Application.Contracts.Task.Request;
 using TaskManagementSystem.Application.Enums;
 using TaskManagementSystem.Application.Models;
 using TaskManagementSystem.Application.Tasks.Commands;
-using TaskManagementSystem.DAL.Data;
+using TaskManagementSystem.Domain.Tasks;
 
 namespace TaskManagementSystem.Application.Tasks.CommandHandlers;
-public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, OperationResult<UpdateTask>>
+internal sealed class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, OperationResult<UpdateTask>>
 {
-    private readonly DataContext _dataContext;
+    private readonly ITaskRepository _taskRepository;
     private readonly IMapper _mapper;
 
-    public UpdateTaskCommandHandler(DataContext dataContext, IMapper mapper)
+    public UpdateTaskCommandHandler(IMapper mapper, ITaskRepository taskRepository)
     {
-        _dataContext = dataContext;
         _mapper = mapper;
+        _taskRepository = taskRepository;
     }
 
     public async Task<OperationResult<UpdateTask>> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
@@ -24,13 +24,13 @@ public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, Opera
         var result = new OperationResult<UpdateTask>();
         try
         {
-            var task = await _dataContext.Tasks.FirstOrDefaultAsync(t => t.Id == request.TaskId, cancellationToken);
-            if(task is null)
+            var task = await _taskRepository.GetAsync(new Expression<Func<Domain.Tasks.Task, bool>>[] { c => c.Id == request.TaskId }, cancellationToken);
+            if (task is null)
             {
                 result.AddError(ErrorCode.NotFound, "No task is found.");
                 return result;
             }
-            if(task.UserProfileId != request.UserId)
+            if (task.UserProfileId != request.UserId)
             {
                 result.AddError(ErrorCode.UserNotAllowed, "User is not allowed to do specific operation");
                 return result;
@@ -42,7 +42,7 @@ public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, Opera
             task.Priority = request.Priority;
             task.CategoryId = request.CategoryId;
 
-            await _dataContext.SaveChangesAsync(cancellationToken);
+            await _taskRepository.UpdateAsync(task, cancellationToken);
             var mappedTask = _mapper.Map<UpdateTask>(task);
             result.Payload = mappedTask;
         }
